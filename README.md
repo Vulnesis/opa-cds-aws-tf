@@ -1,5 +1,7 @@
 # opa-cds-aws-tf
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Vulnetix/opa-cds-aws-tf)
+
 Vulnetix-compatible OPA/Rego rules for AWS Terraform source files, adapted from the intent of the [CDS-SNC `opa_checks`](https://github.com/cds-snc/opa_checks) ruleset.
 
 Load from the Vulnetix CLI:
