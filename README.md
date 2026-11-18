@@ -1,13 +1,13 @@
 # opa-cds-aws-tf
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Vulnetix/opa-cds-aws-tf)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Vulnesis/opa-cds-aws-tf)
 
 Vulnetix-compatible OPA/Rego rules for AWS Terraform source files, adapted from the intent of the [CDS-SNC `opa_checks`](https://github.com/cds-snc/opa_checks) ruleset.
 
 Load from the Vulnesis CLI:
 
 ```bash
-vulnesis scan --rule Vulnesis/opa-cds-aws-tf
+vulnetix scan --rule Vulnesis/opa-cds-aws-tf
 ```
 
 ## Clean-room approach
@@ -81,25 +81,25 @@ The Vulnesis CLI walks every `.rego` file under `rules/` recursively, so the per
 Load alongside the built-in Vulnesis ruleset:
 
 ```bash
-vulnesis scan --rule Vulnesis/opa-cds-aws-tf
+vulnetix scan --rule Vulnesis/opa-cds-aws-tf
 ```
 
 Use only these rules (skip the built-ins):
 
 ```bash
-vulnesis scan --disable-default-rules --rule Vulnesis/opa-cds-aws-tf
+vulnetix scan --disable-default-rules --rule Vulnesis/opa-cds-aws-tf
 ```
 
 Gate CI by severity:
 
 ```bash
-vulnesis scan --rule Vulnesis/opa-cds-aws-tf --severity high
+vulnetix scan --rule Vulnesis/opa-cds-aws-tf --severity high
 ```
 
 Pair with the other clean-room opa-* rule sets in the Vulnesis org:
 
 ```bash
-vulnesis scan \
+vulnetix scan \
   --rule Vulnesis/opa-cds-aws-tf \
   --rule Vulnesis/opa-aquasecurity-trivy \
   --rule Vulnesis/opa-snyk-labs-iac \
