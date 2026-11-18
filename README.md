@@ -1,13 +1,13 @@
 # opa-cds-aws-tf
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Vulnetix/opa-cds-aws-tf)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Vulnesis/opa-cds-aws-tf)
 
-Vulnetix-compatible OPA/Rego rules for AWS Terraform source files, adapted from the intent of the [CDS-SNC `opa_checks`](https://github.com/cds-snc/opa_checks) ruleset.
+Vulnesis-compatible OPA/Rego rules for AWS Terraform source files, adapted from the intent of the [CDS-SNC `opa_checks`](https://github.com/cds-snc/opa_checks) ruleset.
 
-Load from the Vulnetix CLI:
+Load from the Vulnesis CLI:
 
 ```bash
-vulnetix scan --rule Vulnetix/opa-cds-aws-tf
+vulnesis scan --rule Vulnesis/opa-cds-aws-tf
 ```
 
 ## Clean-room approach
@@ -15,11 +15,11 @@ vulnetix scan --rule Vulnetix/opa-cds-aws-tf
 These rules were produced using a **clean-room** methodology:
 
 1. The **intent** of each upstream CDS-SNC rule was studied — what misconfiguration it flags, why it matters at deploy time or at runtime, and what it expects the remediated Terraform to look like.
-2. Detection logic was then **written from scratch** against the Vulnetix CLI's `input.file_contents` schema.
-3. **No upstream Rego code was copied.** The CDS-SNC rules operate on `terraform show -json` plan output — a completely different input shape — so they cannot be used verbatim with Vulnetix in any case. The helper library (`rules/_lib/tf.rego`) and the PostgreSQL reserved-word list (`rules/_lib/pg_reserved.rego`) are original implementations: the library parses raw HCL with regex under `terraform fmt` conventions; the reserved-word list is compiled from the public PostgreSQL 16 Appendix C documentation (facts, not copyrightable).
+2. Detection logic was then **written from scratch** against the Vulnesis CLI's `input.file_contents` schema.
+3. **No upstream Rego code was copied.** The CDS-SNC rules operate on `terraform show -json` plan output — a completely different input shape — so they cannot be used verbatim with Vulnesis in any case. The helper library (`rules/_lib/tf.rego`) and the PostgreSQL reserved-word list (`rules/_lib/pg_reserved.rego`) are original implementations: the library parses raw HCL with regex under `terraform fmt` conventions; the reserved-word list is compiled from the public PostgreSQL 16 Appendix C documentation (facts, not copyrightable).
 4. The upstream is MIT-licensed; this repository is **Apache-2.0** (see `LICENSE`). Because nothing is derived from the upstream source, the licenses do not interact.
 
-The result is a set of rules that match the **security and correctness intent** of the upstream checks while being natively compatible with the Vulnetix CLI `--rule` mechanism and with raw `.tf` source files — no Terraform plan generation required.
+The result is a set of rules that match the **security and correctness intent** of the upstream checks while being natively compatible with the Vulnesis CLI `--rule` mechanism and with raw `.tf` source files — no Terraform plan generation required.
 
 ## Coverage
 
@@ -74,35 +74,35 @@ opa-cds-aws-tf/
     └── waf/duplicate_priority.rego
 ```
 
-The Vulnetix CLI walks every `.rego` file under `rules/` recursively, so the per-service sub-directories are loaded automatically.
+The Vulnesis CLI walks every `.rego` file under `rules/` recursively, so the per-service sub-directories are loaded automatically.
 
 ## Usage
 
-Load alongside the built-in Vulnetix ruleset:
+Load alongside the built-in Vulnesis ruleset:
 
 ```bash
-vulnetix scan --rule Vulnetix/opa-cds-aws-tf
+vulnesis scan --rule Vulnesis/opa-cds-aws-tf
 ```
 
 Use only these rules (skip the built-ins):
 
 ```bash
-vulnetix scan --disable-default-rules --rule Vulnetix/opa-cds-aws-tf
+vulnesis scan --disable-default-rules --rule Vulnesis/opa-cds-aws-tf
 ```
 
 Gate CI by severity:
 
 ```bash
-vulnetix scan --rule Vulnetix/opa-cds-aws-tf --severity high
+vulnesis scan --rule Vulnesis/opa-cds-aws-tf --severity high
 ```
 
-Pair with the other clean-room opa-* rule sets in the Vulnetix org:
+Pair with the other clean-room opa-* rule sets in the Vulnesis org:
 
 ```bash
-vulnetix scan \
-  --rule Vulnetix/opa-cds-aws-tf \
-  --rule Vulnetix/opa-aquasecurity-trivy \
-  --rule Vulnetix/opa-snyk-labs-iac \
+vulnesis scan \
+  --rule Vulnesis/opa-cds-aws-tf \
+  --rule Vulnesis/opa-aquasecurity-trivy \
+  --rule Vulnesis/opa-snyk-labs-iac \
   --severity high
 ```
 
@@ -110,11 +110,11 @@ vulnetix scan \
 
 ### HCL parsing
 
-Vulnetix delivers file contents as raw text, not parsed AST. `rules/_lib/tf.rego` provides regex-based helpers that:
+Vulnesis delivers file contents as raw text, not parsed AST. `rules/_lib/tf.rego` provides regex-based helpers that:
 
 - Discover `resource "TYPE" "NAME"` / `data "TYPE" "NAME"` blocks and nested sub-blocks using `terraform fmt` conventions (top-level `}` at column 0; nested `}` at matching indentation).
 - Extract string, numeric, and reference attribute values (`attr_string`, `attr_raw`).
-- Return accurate 1-based line numbers for findings so that editors, SARIF consumers, and the Vulnetix UI can point to the offending line.
+- Return accurate 1-based line numbers for findings so that editors, SARIF consumers, and the Vulnesis UI can point to the offending line.
 
 The helpers do not attempt full HCL parsing — unusual formatting (e.g. `}` not at column 0) may produce false negatives. In exchange, there is zero dependency on an HCL parser or a Terraform plan. Run `terraform fmt` before scanning for the most accurate results.
 
